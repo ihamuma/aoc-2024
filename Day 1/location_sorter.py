@@ -1,4 +1,4 @@
-file = open('Day 1/input.txt', 'r')
+file = open('/Users/markus/GitHub/aoc-2024/Day 1/input.txt', 'r')
 data = file.readlines()
 
 data_split = [tuple(x.strip('\n').split('   ')) for x in data]
