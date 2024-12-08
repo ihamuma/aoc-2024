@@ -22,20 +22,18 @@ fn main() {
 
     println!("The total distance is: {}", sum);
 
-    let mut similarity_scores: Vec<u64> = Vec::new();
-    for distance in &locations_one {
-        let mut sim_score: u64 = 0;
-        for elem in &locations_two {
-            if elem == distance {
+    let mut similarity_score: i64 = 0;
+    for elem_1 in &locations_one {
+        let mut sim_score: i64 = 0;
+        for elem_2 in &locations_two {
+            if elem_1 == elem_2 {
                 sim_score += 1
             }
         }
-        similarity_scores.push(sim_score)
+        similarity_score += sim_score * elem_1
     }
 
-    let sim_sum: u64 = similarity_scores.iter().sum();
-
-    println!("The similarity score is: {}", sim_sum)
+    println!("The similarity score is: {}", similarity_score)
 
 }
 
@@ -50,17 +48,20 @@ fn file_to_string_vec(path: &str) -> Vec<String> {
             Err(_) => break,
         }
     }
+
     by_line
 }
 
 fn split_to_int_vecs (vec: Vec<String>) -> (Vec<i64>, Vec<i64>) {
     let mut locations_one: Vec<i64> = Vec::new();
     let mut locations_two: Vec<i64> = Vec::new();
+
     for line in vec {
         let split: Vec<&str> = line.split("   ").collect();
         locations_one.push(string_to_int(&split[0]));
         locations_two.push(string_to_int(&split[1]));
     }
+
     locations_one.sort();
     locations_two.sort();
 
@@ -68,9 +69,11 @@ fn split_to_int_vecs (vec: Vec<String>) -> (Vec<i64>, Vec<i64>) {
 }
 
 fn string_to_int (s: &str) -> i64 {
+
     let guess: i64 = match s.trim().parse() {
         Ok(num) => num,
         Err(_) => panic!("Fuck, that didn't work"),
     };
+
     guess
 }
