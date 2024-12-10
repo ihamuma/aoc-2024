@@ -9,14 +9,29 @@ fn main() {
     let reports: Vec<Vec<i64>> = split_to_int_vecs(by_line);
 
     let mut safes: u32 = 0;
+    let mut unsafes: Vec<Vec<i64>> = Vec::new();
 
     for report in reports {
         if check_safety(&report) {
             safes += 1
+        } else {
+            unsafes.push(report);
         }
     }
 
-    println!("There are {} safe reports", safes)
+    println!("There are {} safe reports", safes);
+    println!("{} reports are currently unsafe", unsafes.len());
+
+    let mut dampened_safes: u32 = 0;
+    for report in unsafes {
+        if check_dampened_safety(&report) {
+            dampened_safes += 1
+        }
+    }
+
+    println!("Of the unsafe reports, {} are dampened safe", dampened_safes);
+    println!("In total, there are {} safe reports", safes + dampened_safes)
+    
 }
 
 fn file_to_string_vec(path: &str) -> Vec<String> {
@@ -80,4 +95,17 @@ fn check_safety (report: &Vec<i64>) -> bool {
     }
 
     true
+}
+
+fn check_dampened_safety (report: &Vec<i64>) -> bool {
+
+    for i in 0..report.len() {
+        let mut test = report.clone();
+        test.remove(i);
+        if check_safety(&test) {
+            return true
+        }
+    }
+
+    false
 }
