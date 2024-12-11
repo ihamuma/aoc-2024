@@ -1,48 +1,36 @@
 use std::fs::File;
 use std::io::{BufReader, BufRead};
-use regex::RegexSet;
+// use regex::RegexSet;
 
 fn main() {
-    let path: &str = "./test_input.txt";
+    let path: &str = "./input.txt";
     let by_line: Vec<String> = file_to_string_vec(path);
 
-    let horizontal_matches = count_matches(&by_line);
+    let horizontal_matches = find_xmas_in_rows(&by_line);
     println!("Horizontal matches: {}", horizontal_matches);
 
     let mut matrix: Vec<Vec<char>> = Vec::new();
     for line in by_line {
-        let as_char_vec: Vec<char> = line.chars().collect();
-        matrix.push(as_char_vec);
+        let as_char_vecs: Vec<char> = line.chars().collect();
+        matrix.push(as_char_vecs);
     }
     
     let matrix_clone = matrix.clone();
     let transposed = transpose(matrix);
     let mut trans_clone = transposed.clone();
     let string_vec = char_to_string_vec(transposed);
-    let vertical_matches = count_matches(&string_vec);
+    let vertical_matches = find_xmas_in_rows(&string_vec);
     println!("Vertical matches: {}", vertical_matches);
 
-    for mcs in &matrix_clone {
-        println!("{:?}", mcs)
-    }
-    let diagonals_1 = diagonal_matrix(matrix_clone);
-    for diag in &diagonals_1 {
-        println!("{:?}", diag)
-    }
+    let diagonals_1 = diagonal_matrix(matrix_clone);    
     let string_vec = char_to_string_vec(diagonals_1);
-    let diagonal_1_matches = count_matches(&string_vec);
+    let diagonal_1_matches = find_xmas_in_rows(&string_vec);
     println!("Diagonal 1 matches: {}", diagonal_1_matches);
 
-    trans_clone.iter_mut().for_each(|arr| arr.reverse());
-    for tsds in &trans_clone {
-        println!("{:?}", tsds)
-    }
-    let diagonals_2 = diagonal_matrix(trans_clone);
-    for diag in &diagonals_2 {
-        println!("{:?}", diag)
-    }
+    trans_clone.iter_mut().for_each(|arr| arr.reverse());    
+    let diagonals_2 = diagonal_matrix(trans_clone);    
     let string_vec = char_to_string_vec(diagonals_2);
-    let diagonal_2_matches = count_matches(&string_vec);
+    let diagonal_2_matches = find_xmas_in_rows(&string_vec);
     println!("Diagonal 2 matches: {}", diagonal_2_matches);
 
     let total = horizontal_matches + vertical_matches + diagonal_1_matches + diagonal_2_matches;
@@ -65,6 +53,26 @@ fn file_to_string_vec(path: &str) -> Vec<String> {
     by_line
 }
 
+fn find_xmas_in_rows (allwords: &Vec<String>) -> i32{
+    let mut xmascount = 0;
+    let keyword = "XMAS".to_string();
+    let reverse = keyword.chars().rev().collect::<String>();
+    for rows in allwords {
+        let mut i = 0;
+        let mut j = keyword.len();
+        while j <= rows.len() {
+            if rows[i..j] == keyword || rows[i..j] == reverse {
+                xmascount += 1;
+            }
+            i += 1;
+            j += 1;
+        }
+    }
+    xmascount
+}
+
+/*
+Regex betrayed me
 fn count_matches (matchable: &Vec<String>) -> u32 {
     let set = RegexSet::new(&[
         r"XMAS",
@@ -86,6 +94,7 @@ fn count_matches (matchable: &Vec<String>) -> u32 {
 fn flatten<T> (nested: Vec<Vec<T>>) -> Vec<T> {
     nested.into_iter().flatten().collect()
 }
+ */
 
 fn transpose (v: Vec<Vec<char>>) -> Vec<Vec<char>> {
     assert!(!v.is_empty());
@@ -101,10 +110,10 @@ fn transpose (v: Vec<Vec<char>>) -> Vec<Vec<char>> {
         .collect()
 }
 
-fn char_to_string_vec (char_vec: Vec<Vec<char>>) -> Vec<String> {
+fn char_to_string_vec (char_vecs: Vec<Vec<char>>) -> Vec<String> {
     let mut string_vec = Vec::new();
-    for tsd in char_vec {
-        let to_string: String = tsd.iter().collect();
+    for cvec in char_vecs {
+        let to_string: String = cvec.iter().collect();
         string_vec.push(to_string)
     }
     string_vec
