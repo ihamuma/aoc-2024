@@ -80,15 +80,13 @@ fn check_safety (report: &Vec<i64>) -> bool {
     
     if ascending {
         for i in 1..report.len() {
-            let diff = (report[i - 1] - report[i]).abs();
-            if report[i - 1] > report[i] || 3 < diff || diff < 1  {
+            if report[i - 1] >= report[i] || 3 < (report[i - 1] - report[i]).abs(){
                 return false
             }
         }
     } else {
         for i in 1..report.len() {
-            let diff = (report[i - 1] - report[i]).abs();
-            if report[i - 1] < report[i] || 3 < diff || diff < 1  {
+            if report[i - 1] <= report[i] || 3 < (report[i - 1] - report[i]).abs(){
                 return false
             }
         }
