@@ -15,11 +15,39 @@ fn main() {
         matrix.push(as_char_vec);
     }
     
+    let matrix_clone = matrix.clone();
     let transposed = transpose(matrix);
+    let mut trans_clone = transposed.clone();
     let string_vec = char_to_string_vec(transposed);
     let vertical_matches = count_matches(&string_vec);
     println!("Vertical matches: {}", vertical_matches);
 
+    for mcs in &matrix_clone {
+        println!("{:?}", mcs)
+    }
+    let diagonals_1 = diagonal_matrix(matrix_clone);
+    for diag in &diagonals_1 {
+        println!("{:?}", diag)
+    }
+    let string_vec = char_to_string_vec(diagonals_1);
+    let diagonal_1_matches = count_matches(&string_vec);
+    println!("Diagonal 1 matches: {}", diagonal_1_matches);
+
+    trans_clone.iter_mut().for_each(|arr| arr.reverse());
+    for tsds in &trans_clone {
+        println!("{:?}", tsds)
+    }
+    let diagonals_2 = diagonal_matrix(trans_clone);
+    for diag in &diagonals_2 {
+        println!("{:?}", diag)
+    }
+    let string_vec = char_to_string_vec(diagonals_2);
+    let diagonal_2_matches = count_matches(&string_vec);
+    println!("Diagonal 2 matches: {}", diagonal_2_matches);
+
+    let total = horizontal_matches + vertical_matches + diagonal_1_matches + diagonal_2_matches;
+
+    println!("Total matches: {}", total)
 }
 
 fn file_to_string_vec(path: &str) -> Vec<String> {
@@ -82,3 +110,29 @@ fn char_to_string_vec (char_vec: Vec<Vec<char>>) -> Vec<String> {
     string_vec
 }
 
+fn diagonal_matrix (matrix: Vec<Vec<char>>) -> Vec<Vec<char>> {
+    let len_y = matrix.len();
+    let len_x = matrix[0].len();
+    assert!(len_y == len_x);
+    
+    let mut diag_matr = Vec::new();
+    for h in 4..=len_y {
+        let mut low_vec = Vec::new();
+        let mut high_vec = Vec::new();
+        let mut i = len_y - h;
+        let mut j = 0;
+        while i != len_y {
+            let push_low = matrix[i][j];
+            let push_high = matrix[j][i];
+            low_vec.push(push_low);
+            high_vec.push(push_high);
+            i += 1;
+            j += 1;
+        }
+        diag_matr.push(low_vec);
+        diag_matr.push(high_vec);
+    }
+    let _last = diag_matr.pop();
+
+    diag_matr
+}
