@@ -4,11 +4,9 @@ use regex::RegexSet;
 
 fn main() {
     let path: &str = "./test_input.txt";
-
     let by_line: Vec<String> = file_to_string_vec(path);
 
     let horizontal_matches = count_matches(&by_line);
-
     println!("Horizontal matches: {}", horizontal_matches);
 
     let mut matrix: Vec<Vec<char>> = Vec::new();
@@ -18,14 +16,8 @@ fn main() {
     }
     
     let transposed = transpose(matrix);
-
-    let mut tsd_as_string = Vec::new();
-    for tsd in transposed {
-        let to_string: String = tsd.iter().collect();
-        tsd_as_string.push(to_string)
-    }
-
-    let vertical_matches = count_matches(&tsd_as_string);
+    let string_vec = char_to_string_vec(transposed);
+    let vertical_matches = count_matches(&string_vec);
     println!("Vertical matches: {}", vertical_matches);
 
 }
@@ -80,3 +72,13 @@ fn transpose (v: Vec<Vec<char>>) -> Vec<Vec<char>> {
         })
         .collect()
 }
+
+fn char_to_string_vec (char_vec: Vec<Vec<char>>) -> Vec<String> {
+    let mut string_vec = Vec::new();
+    for tsd in char_vec {
+        let to_string: String = tsd.iter().collect();
+        string_vec.push(to_string)
+    }
+    string_vec
+}
+
