@@ -1,6 +1,5 @@
 use std::fs::File;
 use std::io::{BufReader, BufRead};
-// use regex::RegexSet;
 
 fn main() {
     let path: &str = "./input.txt";
@@ -16,6 +15,7 @@ fn main() {
     }
     
     let matrix_clone = matrix.clone();
+    let matrix_re_clone = matrix.clone();
     let transposed = transpose(matrix);
     let mut trans_clone = transposed.clone();
     let string_vec = char_to_string_vec(transposed);
@@ -35,7 +35,11 @@ fn main() {
 
     let total = horizontal_matches + vertical_matches + diagonal_1_matches + diagonal_2_matches;
 
-    println!("Total matches: {}", total)
+    println!("Total matches: {}", total);
+
+    let xed_mases = count_xed_mases(&matrix_re_clone);
+
+    println!("The amount of X-MASes is {}", xed_mases)
 }
 
 fn file_to_string_vec(path: &str) -> Vec<String> {
@@ -70,31 +74,6 @@ fn find_xmas_in_rows (allwords: &Vec<String>) -> i32{
     }
     xmascount
 }
-
-/*
-Regex betrayed me
-fn count_matches (matchable: &Vec<String>) -> u32 {
-    let set = RegexSet::new(&[
-        r"XMAS",
-        r"SAMX",
-    ]).unwrap();
-
-    let mut matches = Vec::new();
-    for s in matchable {
-        let m: Vec<_> = set.matches(&s).into_iter().collect();
-        matches.push(m);
-    }
-
-    let flat_matches = flatten(matches);
-    let counted_matches: u32 = flat_matches.len().try_into().unwrap();
-    
-    counted_matches
-}
-
-fn flatten<T> (nested: Vec<Vec<T>>) -> Vec<T> {
-    nested.into_iter().flatten().collect()
-}
- */
 
 fn transpose (v: Vec<Vec<char>>) -> Vec<Vec<char>> {
     assert!(!v.is_empty());
@@ -144,4 +123,25 @@ fn diagonal_matrix (matrix: Vec<Vec<char>>) -> Vec<Vec<char>> {
     let _last = diag_matr.pop();
 
     diag_matr
+}
+
+fn count_xed_mases (matrix: &Vec<Vec<char>>) -> u32 {
+    let mut xed_mas_count: u32 = 0;
+    let mas = String::from("MAS");
+    let sam = String::from("SAM");
+
+    for i in 1..matrix.len()-1 {
+        for j in 1..matrix[0].len()-1 {
+            if matrix[i][j] == 'A' {
+                let diag_1 = vec![matrix[i-1][j-1], 'A', matrix[i+1][j+1]];
+                let diag_2 = vec![matrix[i+1][j-1], 'A', matrix[i-1][j+1]];
+                let diag_1: String = diag_1.iter().collect();
+                let diag_2: String = diag_2.iter().collect();
+                if (diag_1 == mas || diag_1 == sam ) && (diag_2 == mas || diag_2 == sam) {
+                    xed_mas_count += 1;
+                }
+            }
+        }
+    }
+    xed_mas_count
 }
