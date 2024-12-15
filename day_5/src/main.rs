@@ -7,17 +7,27 @@ fn main() {
     let path: &str = "./input.txt";
     let by_line: Vec<String> = file_to_string_vec(path);
 
-    let (rules, updates) = extract_rule_and_updates(&by_line);
+    let (rules, updates) = extract_rules_and_updates(&by_line);
 
     let mapped_rules = tuples_to_hashmap(&rules);
 
     let mut valid_mid_elem_sum = 0;
-    for update in &updates {
+    let mut invalid_updates = Vec::new();
+    for update in updates {
         if update_is_valid(&update, &mapped_rules) {
             valid_mid_elem_sum += middle_element(&update)
+        } else {
+            invalid_updates.push(update);
         }
     }
-    println!("The sum of all valid middle elements is {valid_mid_elem_sum}")
+    println!("The sum of all valid middle elements is {valid_mid_elem_sum}");
+
+    let mut fixed_mid_elem_sum = 0;
+    for mut inv in invalid_updates {
+        let fixed = fix_invalid_update(&mut inv, &mapped_rules);
+        fixed_mid_elem_sum += middle_element(&fixed)
+    }
+    println!("The sum of all fixed middle elements is {fixed_mid_elem_sum}");
 }
 
 fn file_to_string_vec(path: &str) -> Vec<String> {
@@ -35,7 +45,7 @@ fn file_to_string_vec(path: &str) -> Vec<String> {
     by_line
 }
 
-fn extract_rule_and_updates (r_and_u: &Vec<String>) -> (Vec<(u32, u32)>, Vec<Vec<u32>>) {
+fn extract_rules_and_updates (r_and_u: &Vec<String>) -> (Vec<(u32, u32)>, Vec<Vec<u32>>) {
     let mut rules = Vec::new();
     let mut updates: Vec<Vec<u32>> = Vec::new();
     for line in r_and_u {
@@ -90,4 +100,23 @@ fn update_is_valid (update: &Vec<u32>, rules: &HashMap<u32, HashSet<u32>>) -> bo
 
 fn middle_element (vec: &Vec<u32>) -> u32 {
     vec[vec.len() / 2]
+}
+
+fn fix_invalid_update (update: &mut Vec<u32>, rules: &HashMap<u32, HashSet<u32>>) -> Vec<u32> {
+    let mut update = update.clone();
+    while !update_is_valid(&update, rules) {
+        for i in 1..update.len() {
+            let rule_set = match rules.get(&update[i]) {
+                Some(set) => set,
+                None => continue,
+            };
+            for j in 0..i {
+                if rule_set.contains(&update[j]) {
+                    update.swap(i, j);
+                }
+            }
+        }
+    }
+    let res = update.to_vec();
+    res
 }
