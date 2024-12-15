@@ -103,7 +103,6 @@ fn middle_element (vec: &Vec<u32>) -> u32 {
 }
 
 fn fix_invalid_update (update: &mut Vec<u32>, rules: &HashMap<u32, HashSet<u32>>) -> Vec<u32> {
-    let mut update = update.clone();
     while !update_is_valid(&update, rules) {
         for i in 1..update.len() {
             let rule_set = match rules.get(&update[i]) {
