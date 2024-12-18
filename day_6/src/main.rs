@@ -1,8 +1,9 @@
+use std::collections::HashSet;
 use std::fs::File;
 use std::io::{BufReader, BufRead};
 
 fn main() {
-    let path: &str = "./test_input.txt";
+    let path: &str = "./input.txt";
     let by_line: Vec<String> = file_to_string_vec(path);
     
     let mut matrix: Vec<Vec<char>> = str_vec_to_matrix(by_line);
@@ -94,10 +95,15 @@ fn main() {
             matrix[obs_y][obs_x] = 'O'
         }
 
-        // Place "test guard" in position before new obstacle and turn right
+        // Place "test guard" in position before new obstacle
         let new_start_pos = move_back(&obs_dir, obs_i, obs_j);
         i = new_start_pos.0;
         j = new_start_pos.1;
+
+        // Initialise HashSet to store previous locations
+        let mut location_map = HashSet::new();
+
+        // Turn right to not hit new obstacle immediately
         dir = turn_right(&obs_dir);
 
         'loop_or_exit: loop {
@@ -109,42 +115,35 @@ fn main() {
             // If guard makes it outside, mark as previous obstacled and break loop
             if is_outside((&i, &j), &len_y, &len_x) { 
                 matrix[obs_y][obs_x] = 'P';
-                println!("Guard out. Next obstacle.");
                 break 'loop_or_exit; 
+            }
+
+            // If same dir, location pair already in location_map
+            // -> second time to that location with same dir
+            // -> guard looped, add to looped count, break loop.
+            if location_map.contains(&(dir, (i, j))) { 
+                looping_obstacles += 1;
+                matrix[obs_y][obs_x] = 'P';
+                break 'loop_or_exit;
+            } else {
+                location_map.insert((dir, (i, j)));
             }
     
             let y = i as usize;
             let x = j as usize;
             let next = matrix[y][x];
-    
-            // If next is an obstacle and comes from original direction, detect loop
-            if next == 'O' && dir == obs_dir { 
-                looping_obstacles += 1;
-                println!("Guard looped! {looping_obstacles}");
-                matrix[obs_y][obs_x] = 'P';
-                break 'loop_or_exit;
-            // If next is an obstacle and comes from different direction, treat as regular obstacle
-            } else if next == 'O' && dir != obs_dir { 
-                // TODO: This is an infinite loop with proper input.
-                //println!("Guard hit obstacle from different direction");
+
+            if next == '#' || next == 'O' { 
                 let prev_pos = move_back(dir, i, j);
                 i = prev_pos.0;
                 j = prev_pos.1;
                 dir = turn_right(dir);
-                continue;
-            } else if next == '#' { 
-                let prev_pos = move_back(dir, i, j);
-                i = prev_pos.0;
-                j = prev_pos.1;
-                dir = turn_right(dir);
-                continue;
-            } else if next == 'P' {
-                continue;
-            } else {
                 continue;
             }
+
         }
     }
+
     println!("There are {looping_obstacles} ways to place an object and create an infinite loop")
 }
 
