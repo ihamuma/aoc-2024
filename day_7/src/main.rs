@@ -14,7 +14,7 @@ fn main () {
                                 .map(|eq| Equation::validate(eq).unwrap())
                                 .sum();
 
-    println!("Result: {}", result);
+    println!("The total calibration result is {result}");
 }
 
 struct Equation {
