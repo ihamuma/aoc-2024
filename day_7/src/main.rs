@@ -1,6 +1,7 @@
 use anyhow::{Context, Ok, Result};
 
 // Most credit must be attributed to https://gist.github.com/marektamaskovic/3421acf52c7e8da882df503fb5495125
+// This was a great learning experience though
 
 fn main () {
     let input = std::fs::read_to_string("./input.txt").unwrap();
@@ -21,9 +22,11 @@ struct Equation {
     numbers: Vec<u64>,
 }
 
-static OPERATORS: [fn(u64, u64) -> u64; 2] = [
+static OPERATORS: [fn (u64, u64) -> u64; 3] = [
     |a: u64, b: u64| -> u64 { a + b },
-    |a: u64, b:u64| -> u64 { a * b },
+    |a: u64, b: u64| -> u64 { a * b },
+    // Comment out this line for part one result
+    |a: u64, b: u64| -> u64 { format!("{}{}", a, b).parse().unwrap() },
 ];
 
 impl Equation {
