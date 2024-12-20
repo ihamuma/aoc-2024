@@ -1,5 +1,7 @@
 use anyhow::{Context, Ok, Result};
 
+// Most credit must be attributed to https://gist.github.com/marektamaskovic/3421acf52c7e8da882df503fb5495125
+
 fn main () {
     let input = std::fs::read_to_string("./input.txt").unwrap();
 
@@ -55,7 +57,9 @@ impl Equation {
     }
 
     fn validate (&self) -> Result<u64> {
-        match Equation::eval(self.result, self.numbers[0], self.numbers[1..].to_vec()).unwrap() {
+        match Equation::eval(self.result, 
+                             self.numbers[0], 
+                             self.numbers[1..].to_vec()).unwrap() {
             true  => Ok(self.result),
             false => Ok(0),
         }
@@ -69,7 +73,9 @@ impl Equation {
         Ok(
             OPERATORS.iter().any(|op| {
                 Equation::eval(
-                    expected_result, op(acc, numbers[0]), numbers[1..].to_vec()
+                    expected_result, 
+                    op(acc, numbers[0]), 
+                    numbers[1..].to_vec()
                 ).unwrap()
             })
         )
