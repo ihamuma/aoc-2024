@@ -15,7 +15,7 @@ fn main() {
                                                        .map(|pos| Antenna::from(pos))
                                                        .collect();
 
-    let mut node_set = HashSet::new();
+    let mut antinode_set = HashSet::new();
 
     for i in 0..antennae.len()-1 {
         let antenna_1 = &antennae[i];
@@ -23,23 +23,18 @@ fn main() {
         for j in i+1..antennae.len() {
             let antenna_2 = &antennae[j];
 
-            if let Some((node_1, node_2)) = Antenna::compare_for_nodes(&antenna_1, &antenna_2) {
-                if Antinode::validate(&node_1, row_bound, col_bound) {
-                    node_set.insert(node_1);
-                    ()
+            if let Some(antinode_vec) = Antenna::compare_for_nodes(&antenna_1, &antenna_2, row_bound, col_bound) {
+                for node in antinode_vec {
+                        antinode_set.insert(node);
                 }
-                if Antinode::validate(&node_2, row_bound, col_bound) {
-                    node_set.insert(node_2);
-                    ()
-                }
+
             }
         }
     }
 
-    println!("There are {} unique antinodes", node_set.len())
+    println!("There are {} unique antinodes", antinode_set.len())
 }
 
-#[derive(Debug)]
 struct Antenna {
     frequency: char,
     row: i8,
@@ -66,7 +61,7 @@ impl Antenna {
     }
 
     // Compare with other Antenna. If same frequency, create antinodes in both directions.
-    fn compare_for_nodes (&self, other: &Antenna) -> Option<(Antinode, Antinode)> {
+    fn compare_for_nodes (&self, other: &Antenna, row_bound: i8, col_bound: i8) -> Option<Vec<Antinode>> {
         if self.frequency != other.frequency {
             return None
         }
@@ -74,21 +69,61 @@ impl Antenna {
         let row_diff = self.row - other.row;
         let col_diff = self.col - other.col;
 
-        let self_antinode = Antinode {
-            row: self.row + row_diff,
-            col: self.col + col_diff
-        };
+        let mut antinode_vec = Vec::new();
 
-        let other_antinode = Antinode {
-            row: other.row - row_diff,
-            col: other.col - col_diff
-        };
+        let mut valid_antinode = true;
+        
+        antinode_vec.push(
+            Antinode {
+                row: self.row,
+                col: self.col
+            }
+        );
 
-        Some((self_antinode, other_antinode))
+        while valid_antinode {
+            let previous_node = antinode_vec.last().unwrap();
+
+            let self_antinode = Antinode {
+                row: previous_node.row + row_diff,
+                col: previous_node.col + col_diff
+            };
+
+            if Antinode::validate(&self_antinode, row_bound, col_bound) {
+                antinode_vec.push(self_antinode);
+            } else {
+                valid_antinode = false
+            }
+        }
+
+        valid_antinode = true;
+        
+        antinode_vec.push(
+            Antinode {
+                row: other.row,
+                col: other.col
+            }
+        );
+
+        while valid_antinode {
+            let previous_node = antinode_vec.last().unwrap();
+
+            let other_antinode = Antinode {
+                row: previous_node.row - row_diff,
+                col: previous_node.col - col_diff
+            };
+
+            if Antinode::validate(&other_antinode, row_bound, col_bound) {
+                antinode_vec.push(other_antinode);
+            } else {
+                valid_antinode = false
+            }
+        }
+
+        Some(antinode_vec)
     }
 }
 
-#[derive(Debug, PartialEq, Eq, Hash)]
+#[derive(PartialEq, Eq, Hash)]
 struct Antinode {
     row: i8, 
     col: i8,
