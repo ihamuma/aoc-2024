@@ -35,6 +35,20 @@ fn main() {
     println!("There are {} unique antinodes", antinode_set.len())
 }
 
+fn find_deviant_chars(matrix: &Vec<Vec<char>>, norm: char) -> Vec<(char, usize, usize)> {
+    let mut results = Vec::new();
+
+    for (i, row) in matrix.iter().enumerate() {
+        for (j, &ch) in row.iter().enumerate() {
+            if ch != norm {
+                results.push((ch, i, j));
+            }
+        }
+    }
+
+    results
+}
+
 struct Antenna {
     frequency: char,
     row: i8,
@@ -134,18 +148,4 @@ impl Antinode {
         self.row >= 0 && self.row < row_bound && 
         self.col >= 0 && self.col < col_bound
     }
-}
-
-fn find_deviant_chars(matrix: &Vec<Vec<char>>, norm: char) -> Vec<(char, usize, usize)> {
-    let mut results = Vec::new();
-
-    for (i, row) in matrix.iter().enumerate() {
-        for (j, &ch) in row.iter().enumerate() {
-            if ch != norm {
-                results.push((ch, i, j));
-            }
-        }
-    }
-
-    results
 }
