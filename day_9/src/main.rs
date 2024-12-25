@@ -52,6 +52,26 @@ fn main() {
 
     println!("The initial check sum is {check_sum}");
 
+    // TODO:
+    /*  Restructure quasi-entirely for efficiency & maybe clarity & correctness. 
+        1. Create HashMap<u8>, Vec<(lower_bound, upper_bound)>
+            1.1. Struct SliceLocation (usize, usize)
+        2. Iterate once over expanded_layout.
+            2.1. For each empty space, find lower and upper bound
+            2.2. entry(length of empty space).pussh(SliceLocation(lower, upper).or_something
+            Result: Map of locations of empty spaces of defined lengths, from left to right.
+        3. Iterate from right to left over expanded_layout.
+            3.1. For each file, record start & end. Look for key of file length in HashMap (LocationMap?)
+            3.2. If found
+                3.2.1. Get first elem from vec in Map (remove said elem from map)   
+                    3.2.1.1. If this empties the underlying Vec, remove key/value pair
+                3.2.2. Slice expanded_layout at start of one to move to allow for 
+                3.2.3. swap_with_slice between found free space and file
+            3.3. Else
+                3.3.1. Handle key not found in a pretty way
+        4. Sum as previously, ignoring -1.
+    */
+
     let mut i = expanded_layout_two.len() - 1;
     //println!("{:?}", &expanded_layout_two[..9]);
 
