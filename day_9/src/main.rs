@@ -1,4 +1,3 @@
-use indicatif::{ProgressBar, ProgressIterator};
 use std::fs;
 
 fn main() {
@@ -7,9 +6,89 @@ fn main() {
                                                                 .map(|ch|ch.to_digit(10).unwrap() as u8)
                                                                 .collect();
 
+    let expanded_layout = expand_layout(disk_map);
+
+    // Cloning to allow pt. 2 manipulations
+    let mut expanded_layout_two = expanded_layout.clone();
+
+    let empty_count = expanded_layout.iter()
+                                            .filter(|&n| *n == -1)
+                                            .count();
+
+    let compacted_layout = compact_layout(expanded_layout, empty_count);
+
+    let mut check_sum = 0;
+    for (i, mem) in compacted_layout.into_iter().enumerate() {
+        check_sum += i as i64 * mem as i64
+    }
+
+    println!("The initial check sum is {check_sum}");
+
+    let mut free_space_locations = locate_free_spaces(&expanded_layout_two);
+    let mut file_locations = locate_files(&expanded_layout_two);
+
+    while !file_locations.is_empty() {
+
+        let file_to_move = file_locations.pop().unwrap();
+        let memory_need = file_to_move.size;
+        let file_lower = file_to_move.lower;
+
+        // Find leftmost adequate free space. Break at first found.
+        let mut index = 0;
+        let mut space_found = false;
+        for (i, fs) in free_space_locations.iter().enumerate() {
+            if fs.size >= memory_need && fs.upper < file_lower  {
+                index = i;
+                space_found = true;
+                break
+            }
+        };
+
+        if !space_found {
+            continue;
+        }
+
+        let mut free_space = free_space_locations.remove(index);
+
+        // If more free space than file needs, insert remaining space back 
+        if free_space.size > memory_need {
+            let diff = free_space.size - memory_need;
+            free_space_locations.insert(index, 
+                FreeSpaceInfo {
+                    size: diff,
+                    lower: free_space.upper - (diff - 1),
+                    upper: free_space.upper
+                });
+            free_space.upper = free_space.upper - diff;
+        };
+
+        let free_lower = free_space.lower;
+        let free_upper = free_space.upper;
+        
+        let (left, right) = expanded_layout_two.split_at_mut(file_lower);
+
+        if left.len() < memory_need { continue }
+
+        let file_to_move = &mut right[..memory_need];
+        let space_for_file = &mut left[free_lower..=free_upper];
+
+        space_for_file.swap_with_slice(file_to_move);
+    }
+
+    let mut second_check_sum = 0;
+    for (i, mem) in expanded_layout_two.into_iter().enumerate() {
+        if mem != -1 {
+            second_check_sum += i as i64 * mem as i64
+        }
+    }
+
+    println!("The final check sum is {second_check_sum}")
+}
+
+fn expand_layout (disk: Vec<u8>) -> Vec<i16> {
     let mut expanded_layout = Vec::new();
     let mut id: i16 = -1;
-    for (i, mem) in disk_map.into_iter().enumerate() {
+    for (i, mem) in disk.into_iter().enumerate() {
         if mem == 0 { continue };
 
         if i % 2 == 0 {
@@ -23,117 +102,102 @@ fn main() {
             }
         }
     }
+    expanded_layout
+}
 
-    // Cloning to allow pt. 2 manipulations
-    let mut expanded_layout_two = expanded_layout.clone();
-
-    let empty_count = expanded_layout.iter()
-                                            .filter(|&n| *n == -1)
-                                            .count();
-
+fn compact_layout (mut expanded: Vec<i16>, empties: usize) -> Vec<i16> {
     let mut compacted_layout = Vec::new();
 
-    for i in 0..expanded_layout.len() - empty_count {
-        if expanded_layout[i] == -1 {
-            let mut last = expanded_layout.pop().unwrap();
+    for i in 0..expanded.len() - empties {
+        if expanded[i] == -1 {
+            let mut last = expanded.pop().unwrap();
             while last == -1 {
-                last = expanded_layout.pop().unwrap();
+                last = expanded.pop().unwrap();
             }
             compacted_layout.push(last);
         } else {
-            compacted_layout.push(expanded_layout[i]);
+            compacted_layout.push(expanded[i]);
         }
+    }
+    compacted_layout
+}
+
+struct FreeSpaceInfo {
+    size: usize,
+    lower: usize,
+    upper: usize,
+}
+
+// See locate_files for enumerating version
+fn locate_free_spaces (memory: &Vec<i16>) -> Vec<FreeSpaceInfo> {
+    let mut locations = Vec::new();
+    let lim = memory.len() - 1;
+
+    let mut i = 0;
+    loop {
+        while memory[i] != -1 { 
+            i += 1;
+            if i >= lim { break }
+        }
+        let lower = i;
+
+        while memory[i] == -1 { 
+            i += 1 ;
+            if i >= lim { break }
+        }
+        let upper = i-1;
+
+        let size = upper + 1 - lower;
+        let location = FreeSpaceInfo { 
+            size,
+            lower, 
+            upper 
+        };
+
+        locations.push(location);
+
+        if i >= lim { break }
+    }
+
+    locations
+}
+
+#[derive(Debug)]
+struct FileInfo {
+    size: usize,
+    lower: usize,
+}
+
+// See locate_free_files for non-enumerating version
+fn locate_files (memory: &Vec<i16>) -> Vec<FileInfo> {
+    let mut location_vec = Vec::new();
+    let mut cur_id = memory[0];
+    let mut start = 0;
+
+    for (i, id) in memory.iter().enumerate() {
+        if *id != cur_id {
+            if cur_id != -1 {
+                location_vec.push(
+                    FileInfo {
+                        size: i - start,
+                        lower: start,
+                    }
+                );
+            }
+            cur_id = *id;
+            start = i;
+        }
+    }
+
+    // Add last file to location vec if not in free space
+    if cur_id != -1 {
+        location_vec.push(
+            FileInfo {
+                size: memory.len() - start,
+                lower: start,
+            }
+        )
     };
 
-    let mut check_sum = 0;
-    for (i, mem) in compacted_layout.into_iter().enumerate() {
-        check_sum += i as i64 * mem as i64
-    }
-
-    println!("The initial check sum is {check_sum}");
-
-    // TODO:
-    /*  Restructure quasi-entirely for efficiency & maybe clarity & correctness. 
-        1. Create HashMap<u8>, Vec<(lower_bound, upper_bound)>
-            1.1. Struct SliceLocation (usize, usize)
-        2. Iterate once over expanded_layout.
-            2.1. For each empty space, find lower and upper bound
-            2.2. entry(length of empty space).pussh(SliceLocation(lower, upper).or_something
-            Result: Map of locations of empty spaces of defined lengths, from left to right.
-        3. Iterate from right to left over expanded_layout.
-            3.1. For each file, record start & end. Look for key of file length in HashMap (LocationMap?)
-            3.2. If found
-                3.2.1. Get first elem from vec in Map (remove said elem from map)   
-                    3.2.1.1. If this empties the underlying Vec, remove key/value pair
-                3.2.2. Slice expanded_layout at start of one to move to allow for 
-                3.2.3. swap_with_slice between found free space and file
-            3.3. Else
-                3.3.1. Handle key not found in a pretty way
-        4. Sum as previously, ignoring -1.
-    */
-
-    let mut i = expanded_layout_two.len() - 1;
-    //println!("{:?}", &expanded_layout_two[..9]);
-
-    let bar_size = (expanded_layout_two.len() - 2) as u64;
-    let bar = ProgressBar::new(bar_size);
-
-    // First part of memory is always occupied, no need to check last position
-    while i > 0 {
-        // Current element to examine
-        let cur_id = expanded_layout_two[i];
-
-        // While next id == previous id, iterate until changes
-        let mut j = i-1;
-        while expanded_layout_two[j] == cur_id && j > 0 {
-            bar.inc(1);
-            j -= 1;
-        }
-        // Add one so as to not take unmatching id
-        let lower_bound = j+1;
-        let memory_need = i-j;
-
-        // Slice layout at low bound to enable mutation
-        let (left, right) = expanded_layout_two.split_at_mut(lower_bound);
-
-        // Create slice based on lowest & highest 
-        let movable = &mut right[..memory_need];
-
-        let mut allocatable = false;
-        let mut lower_free = 0;
-        let mut upper_free = 0+memory_need;
-
-        if left.len() >= memory_need {
-            for k in 0..left.len()-memory_need {
-                let test_slice = &mut left[k..k+memory_need];
-                if test_slice.iter().all(|&x| x == -1) {
-                    lower_free = k;
-                    upper_free = k+memory_need;
-                    allocatable = true;
-                    break
-                }
-            }
-        }
-
-        if allocatable {
-            let allocated = &mut left[lower_free..upper_free];
-            allocated.swap_with_slice(movable);
-            //println!("{:?}", &expanded_layout_two[..19]);
-        }
-
-        i = j;
-    }
-
-    bar.finish();
-
-    let mut second_check_sum = 0;
-    for (i, mem) in expanded_layout_two.into_iter().enumerate().progress() {
-        if mem != -1 {
-            second_check_sum += i as i64 * mem as i64
-        }
-    }
-
-    println!("The final check sum is {second_check_sum}")
-    // Current too high 6390782022205
-
+    location_vec
 }
