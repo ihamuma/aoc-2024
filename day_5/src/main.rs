@@ -1,11 +1,13 @@
-use std::fs::File;
-use std::io::{BufReader, BufRead};
+use std::fs;
 use std::collections::HashMap;
 use std::collections::HashSet;
 
 fn main() {
     let path: &str = "./input.txt";
-    let by_line: Vec<String> = file_to_string_vec(path);
+    let by_line: Vec<String> = fs::read_to_string(path).unwrap()
+                                                        .lines()
+                                                        .map(|line| String::from(line))
+                                                        .collect();
 
     let (rules, updates) = extract_rules_and_updates(&by_line);
 
@@ -28,21 +30,6 @@ fn main() {
         fixed_mid_elem_sum += middle_element(&fixed)
     }
     println!("The sum of all fixed middle elements is {fixed_mid_elem_sum}");
-}
-
-fn file_to_string_vec(path: &str) -> Vec<String> {
-    let file: File = File::open(&path).expect("Couldn't open file");
-    let reader: BufReader<File> = BufReader::new(file);
-
-    let mut by_line: Vec<String> = Vec::new();
-    for line in reader.lines() {
-        match line {
-            Ok(_) => by_line.push(line.unwrap()),
-            Err(_) => break,
-        }
-    }
-
-    by_line
 }
 
 fn extract_rules_and_updates (r_and_u: &Vec<String>) -> (Vec<(u32, u32)>, Vec<Vec<u32>>) {
