@@ -162,7 +162,6 @@ fn locate_free_spaces (memory: &Vec<i16>) -> Vec<FreeSpaceInfo> {
     locations
 }
 
-#[derive(Debug)]
 struct FileInfo {
     size: usize,
     lower: usize,
