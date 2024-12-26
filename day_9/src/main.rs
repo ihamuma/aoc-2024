@@ -37,7 +37,7 @@ fn main() {
         let mut idx = 0;
         let mut space_found = false;
         for (i, fs) in free_space_locations.iter().enumerate() {
-            if fs.upper > file_lower {
+            if fs.lower > file_lower {
                 break
             } else if fs.size >= memory_need {
                 idx = i;
