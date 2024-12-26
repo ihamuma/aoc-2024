@@ -1,5 +1,4 @@
 use std::fs;
-use std::time::Instant;
 
 fn main() {
     let disk_map: Vec<u8> = fs::read_to_string("./input.txt").unwrap()
@@ -24,8 +23,6 @@ fn main() {
     }
 
     println!("The initial check sum is {check_sum}");
-
-    let now = Instant::now();
 
     let mut free_space_locations = locate_free_spaces(&expanded_layout_two);
     let mut file_locations = locate_files(&expanded_layout_two);
@@ -79,9 +76,6 @@ fn main() {
 
         space_for_file.swap_with_slice(file_to_move);
     }
-
-    let elapsed = now.elapsed();
-    println!("Executing part 2 took {elapsed:.2?}");
 
     let mut second_check_sum = 0;
     for (i, mem) in expanded_layout_two.into_iter().enumerate() {
