@@ -1,4 +1,5 @@
 use std::fs;
+use std::time::Instant;
 
 fn main() {
     let disk_map: Vec<u8> = fs::read_to_string("./input.txt").unwrap()
@@ -24,6 +25,8 @@ fn main() {
 
     println!("The initial check sum is {check_sum}");
 
+    let now = Instant::now();
+
     let mut free_space_locations = locate_free_spaces(&expanded_layout_two);
     let mut file_locations = locate_files(&expanded_layout_two);
 
@@ -33,12 +36,14 @@ fn main() {
         let memory_need = file_to_move.size;
         let file_lower = file_to_move.lower;
 
-        // Find leftmost adequate free space. Break at first found.
-        let mut index = 0;
+        // Find leftmost adequate free space. Break at first found or if to right of file.
+        let mut idx = 0;
         let mut space_found = false;
         for (i, fs) in free_space_locations.iter().enumerate() {
-            if fs.size >= memory_need && fs.upper < file_lower  {
-                index = i;
+            if fs.upper > file_lower {
+                break
+            } else if fs.size >= memory_need {
+                idx = i;
                 space_found = true;
                 break
             }
@@ -48,12 +53,12 @@ fn main() {
             continue;
         }
 
-        let mut free_space = free_space_locations.remove(index);
+        let mut free_space = free_space_locations.remove(idx);
 
         // If more free space than file needs, insert remaining space back 
         if free_space.size > memory_need {
             let diff = free_space.size - memory_need;
-            free_space_locations.insert(index, 
+            free_space_locations.insert(idx, 
                 FreeSpaceInfo {
                     size: diff,
                     lower: free_space.upper - (diff - 1),
@@ -74,6 +79,9 @@ fn main() {
 
         space_for_file.swap_with_slice(file_to_move);
     }
+
+    let elapsed = now.elapsed();
+    println!("Executing part 2 took {elapsed:.2?}");
 
     let mut second_check_sum = 0;
     for (i, mem) in expanded_layout_two.into_iter().enumerate() {
