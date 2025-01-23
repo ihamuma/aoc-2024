@@ -1,8 +1,7 @@
 use std::fs::File;
-use std::io::{BufReader, BufRead};
+use std::io::{BufRead, BufReader};
 
 fn main() {
-
     let path: &str = "./input.txt";
 
     let by_line: Vec<String> = file_to_string_vec(path);
@@ -13,9 +12,7 @@ fn main() {
 
     let mut distances: Vec<i64> = Vec::new();
     for i in 0..locations_one.len() {
-        distances.push(
-            (locations_one[i] - locations_two[i]).abs()
-        );
+        distances.push((locations_one[i] - locations_two[i]).abs());
     }
 
     let sum: i64 = distances.iter().sum();
@@ -34,7 +31,6 @@ fn main() {
     }
 
     println!("The similarity score is: {}", similarity_score)
-
 }
 
 fn file_to_string_vec(path: &str) -> Vec<String> {
@@ -52,7 +48,7 @@ fn file_to_string_vec(path: &str) -> Vec<String> {
     by_line
 }
 
-fn split_to_int_vecs (vec: Vec<String>) -> (Vec<i64>, Vec<i64>) {
+fn split_to_int_vecs(vec: Vec<String>) -> (Vec<i64>, Vec<i64>) {
     let mut locations_one: Vec<i64> = Vec::new();
     let mut locations_two: Vec<i64> = Vec::new();
 
@@ -68,8 +64,7 @@ fn split_to_int_vecs (vec: Vec<String>) -> (Vec<i64>, Vec<i64>) {
     (locations_one, locations_two)
 }
 
-fn string_to_int (s: &str) -> i64 {
-
+fn string_to_int(s: &str) -> i64 {
     let guess: i64 = match s.trim().parse() {
         Ok(num) => num,
         Err(_) => panic!("Fuck, that didn't work"),

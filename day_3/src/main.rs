@@ -15,23 +15,26 @@ fn main() {
     let dos_to_multiply = regex_for_multipliables(&joined_dos);
     let summed_dos = sum_multiples_from_str_vec(dos_to_multiply);
 
-    println!("The sum of uncorrupted multiplications to 'do' is {}", summed_dos);
-
+    println!(
+        "The sum of uncorrupted multiplications to 'do' is {}",
+        summed_dos
+    );
 }
 
-fn regex_for_multipliables (matchable: &str) -> Vec<(&str, &str)> {
+fn regex_for_multipliables(matchable: &str) -> Vec<(&str, &str)> {
     let re = Regex::new(r"(mul\((?<m1>\d+),(?<m2>\d+)\))").unwrap();
-    let multipliables: Vec<(&str, &str)> = re.captures_iter(matchable)
-                                                .map(|caps| {
-                                                    let mult_1 = caps.name("m1").unwrap().as_str();
-                                                    let mult_2 = caps.name("m2").unwrap().as_str();
-                                                    (mult_1, mult_2)
-                                                })
-                                                .collect();
+    let multipliables: Vec<(&str, &str)> = re
+        .captures_iter(matchable)
+        .map(|caps| {
+            let mult_1 = caps.name("m1").unwrap().as_str();
+            let mult_2 = caps.name("m2").unwrap().as_str();
+            (mult_1, mult_2)
+        })
+        .collect();
     multipliables
 }
 
-fn sum_multiples_from_str_vec (str_vec: Vec<(&str, &str)>) -> u32 {
+fn sum_multiples_from_str_vec(str_vec: Vec<(&str, &str)>) -> u32 {
     let mut sum = 0;
 
     for m in str_vec {
@@ -43,8 +46,7 @@ fn sum_multiples_from_str_vec (str_vec: Vec<(&str, &str)>) -> u32 {
     sum
 }
 
-fn string_to_int (s: &str) -> u32 {
-
+fn string_to_int(s: &str) -> u32 {
     let int: u32 = match s.trim().parse() {
         Ok(num) => num,
         Err(_) => panic!("Fuck, that didn't work"),
@@ -53,7 +55,7 @@ fn string_to_int (s: &str) -> u32 {
     int
 }
 
-fn split_by_do_and_dont (memory: &str) -> Vec<&str> {
+fn split_by_do_and_dont(memory: &str) -> Vec<&str> {
     let mut split_by_dont: Vec<&str> = memory.split("don't()").collect();
     // Store first split, as contains strings to do
     let first_dos = split_by_dont[0];
@@ -73,6 +75,6 @@ fn split_by_do_and_dont (memory: &str) -> Vec<&str> {
     flat_dos
 }
 
-fn flatten (nested: Vec<Vec<&str>>) -> Vec<&str> {
+fn flatten(nested: Vec<Vec<&str>>) -> Vec<&str> {
     nested.into_iter().flatten().collect()
 }

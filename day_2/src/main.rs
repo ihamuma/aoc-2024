@@ -1,5 +1,5 @@
 use std::fs::File;
-use std::io::{BufReader, BufRead};
+use std::io::{BufRead, BufReader};
 
 fn main() {
     let path: &str = "./input.txt";
@@ -29,9 +29,14 @@ fn main() {
         }
     }
 
-    println!("Of the unsafe reports, {} are dampened safe", dampened_safes);
-    println!("In total, there are {} safe reports", safes + dampened_safes)
-    
+    println!(
+        "Of the unsafe reports, {} are dampened safe",
+        dampened_safes
+    );
+    println!(
+        "In total, there are {} safe reports",
+        safes + dampened_safes
+    )
 }
 
 fn file_to_string_vec(path: &str) -> Vec<String> {
@@ -49,7 +54,7 @@ fn file_to_string_vec(path: &str) -> Vec<String> {
     by_line
 }
 
-fn split_to_int_vecs (vec: Vec<String>) -> Vec<Vec<i64>> {
+fn split_to_int_vecs(vec: Vec<String>) -> Vec<Vec<i64>> {
     let mut int_vecs: Vec<Vec<i64>> = Vec::new();
 
     for line in vec {
@@ -65,8 +70,7 @@ fn split_to_int_vecs (vec: Vec<String>) -> Vec<Vec<i64>> {
     int_vecs
 }
 
-fn string_to_int (s: &str) -> i64 {
-
+fn string_to_int(s: &str) -> i64 {
     let int: i64 = match s.trim().parse() {
         Ok(num) => num,
         Err(_) => panic!("Fuck, that string didn't become an int"),
@@ -75,19 +79,19 @@ fn string_to_int (s: &str) -> i64 {
     int
 }
 
-fn check_safety (report: &Vec<i64>) -> bool {
+fn check_safety(report: &Vec<i64>) -> bool {
     let ascending: bool = report[0] < report[1];
-    
+
     if ascending {
         for i in 1..report.len() {
-            if report[i - 1] >= report[i] || 3 < (report[i - 1] - report[i]).abs(){
-                return false
+            if report[i - 1] >= report[i] || 3 < (report[i - 1] - report[i]).abs() {
+                return false;
             }
         }
     } else {
         for i in 1..report.len() {
-            if report[i - 1] <= report[i] || 3 < (report[i - 1] - report[i]).abs(){
-                return false
+            if report[i - 1] <= report[i] || 3 < (report[i - 1] - report[i]).abs() {
+                return false;
             }
         }
     }
@@ -95,13 +99,12 @@ fn check_safety (report: &Vec<i64>) -> bool {
     true
 }
 
-fn check_dampened_safety (report: &Vec<i64>) -> bool {
-
+fn check_dampened_safety(report: &Vec<i64>) -> bool {
     for i in 0..report.len() {
         let mut test = report.clone();
         test.remove(i);
         if check_safety(&test) {
-            return true
+            return true;
         }
     }
 

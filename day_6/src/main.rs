@@ -1,18 +1,18 @@
 use std::collections::HashSet;
 use std::fs::File;
-use std::io::{BufReader, BufRead};
+use std::io::{BufRead, BufReader};
 
 fn main() {
     let path: &str = "./input.txt";
     let by_line: Vec<String> = file_to_string_vec(path);
-    
+
     let mut matrix: Vec<Vec<char>> = str_vec_to_matrix(by_line);
     let len_y = matrix.len() as i16;
     let len_x = matrix[0].len() as i16;
-    
+
     let starting_position = match find_char(&matrix, '^') {
         Some(pos) => pos,
-        None => panic!("Starting position not found in matrix!")
+        None => panic!("Starting position not found in matrix!"),
     };
 
     // Mark starting position as already visited, avoid double counting
@@ -29,7 +29,9 @@ fn main() {
         i = new_pos.0;
         j = new_pos.1;
 
-        if is_outside((&i, &j), &len_y, &len_x) { break }
+        if is_outside((&i, &j), &len_y, &len_x) {
+            break;
+        }
 
         // If !is_outside, both i & j are positive and can be cast to usize to get next char
         let y = i as usize;
@@ -37,7 +39,7 @@ fn main() {
         let next = matrix[y][x];
 
         // If next is an obstacle, go back to previous and turn right
-        if next == '#' { 
+        if next == '#' {
             let prev_pos = move_back(dir, i, j);
             i = prev_pos.0;
             j = prev_pos.1;
@@ -67,14 +69,16 @@ fn main() {
     let mut obs_j = j;
     let mut obs_dir = dir;
     let mut looping_obstacles: u16 = 0;
-    
+
     'obstacle_placing: loop {
         // Place obstacle according to previous position and direction
         let new_obs_pos = move_in_dir(obs_dir, obs_i, obs_j);
         obs_i = new_obs_pos.0;
         obs_j = new_obs_pos.1;
 
-        if is_outside((&obs_i, &obs_j), &len_y, &len_x) { break 'obstacle_placing; }
+        if is_outside((&obs_i, &obs_j), &len_y, &len_x) {
+            break 'obstacle_placing;
+        }
 
         let obs_y = obs_i as usize;
         let obs_x = obs_j as usize;
@@ -89,7 +93,7 @@ fn main() {
             continue;
         // If next has previously been checked for looping, continue
         } else if next_obs == 'P' {
-            continue
+            continue;
         // Else place new obstacle
         } else {
             matrix[obs_y][obs_x] = 'O'
@@ -111,36 +115,35 @@ fn main() {
             let new_pos = move_in_dir(dir, i, j);
             i = new_pos.0;
             j = new_pos.1;
-    
+
             // If guard makes it outside, mark as previous obstacled and break loop
-            if is_outside((&i, &j), &len_y, &len_x) { 
+            if is_outside((&i, &j), &len_y, &len_x) {
                 matrix[obs_y][obs_x] = 'P';
-                break 'loop_or_exit; 
+                break 'loop_or_exit;
             }
 
             // If same dir, location pair already in location_map
             // -> second time to that location with same dir
             // -> guard looped, add to looped count, break loop.
-            if location_map.contains(&(dir, (i, j))) { 
+            if location_map.contains(&(dir, (i, j))) {
                 looping_obstacles += 1;
                 matrix[obs_y][obs_x] = 'P';
                 break 'loop_or_exit;
             } else {
                 location_map.insert((dir, (i, j)));
             }
-    
+
             let y = i as usize;
             let x = j as usize;
             let next = matrix[y][x];
 
-            if next == '#' || next == 'O' { 
+            if next == '#' || next == 'O' {
                 let prev_pos = move_back(dir, i, j);
                 i = prev_pos.0;
                 j = prev_pos.1;
                 dir = turn_right(dir);
                 continue;
             }
-
         }
     }
 
@@ -181,32 +184,46 @@ fn find_char(matrix: &Vec<Vec<char>>, target: char) -> Option<(usize, usize)> {
 }
 
 fn move_in_dir(dir: &str, i: i16, j: i16) -> (i16, i16) {
-    if      dir == "up"     { return (i-1, j) } 
-    else if dir == "down"   { return (i+1, j) }
-    else if dir == "left"   { return (i, j-1) }
-    else                    { return (i, j+1)}
+    if dir == "up" {
+        return (i - 1, j);
+    } else if dir == "down" {
+        return (i + 1, j);
+    } else if dir == "left" {
+        return (i, j - 1);
+    } else {
+        return (i, j + 1);
+    }
 }
 
 fn move_back(dir: &str, i: i16, j: i16) -> (i16, i16) {
-    if      dir == "up"     { return (i+1, j) } 
-    else if dir == "down"   { return (i-1, j) }
-    else if dir == "left"   { return (i, j+1) }
-    else                    { return (i, j-1) }
+    if dir == "up" {
+        return (i + 1, j);
+    } else if dir == "down" {
+        return (i - 1, j);
+    } else if dir == "left" {
+        return (i, j + 1);
+    } else {
+        return (i, j - 1);
+    }
 }
 
 fn is_outside(pos: (&i16, &i16), len_y: &i16, len_x: &i16) -> bool {
     let y = pos.0;
     let x = pos.1;
-    if *y < 0 || len_y <= y || 
-       *x < 0 || len_x <= x {
-        return true
+    if *y < 0 || len_y <= y || *x < 0 || len_x <= x {
+        return true;
     }
     false
 }
 
 fn turn_right(dir: &str) -> &str {
-    if      dir == "up"     { return "right"}
-    else if dir == "right"  { return "down" }
-    else if dir == "down"   { return "left" }
-    else                    { return "up" }
+    if dir == "up" {
+        return "right";
+    } else if dir == "right" {
+        return "down";
+    } else if dir == "down" {
+        return "left";
+    } else {
+        return "up";
+    }
 }
