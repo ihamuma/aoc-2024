@@ -1,13 +1,14 @@
-use std::fs;
 use std::collections::HashMap;
 use std::collections::HashSet;
+use std::fs;
 
 fn main() {
     let path: &str = "./input.txt";
-    let by_line: Vec<String> = fs::read_to_string(path).unwrap()
-                                                        .lines()
-                                                        .map(|line| String::from(line))
-                                                        .collect();
+    let by_line: Vec<String> = fs::read_to_string(path)
+        .unwrap()
+        .lines()
+        .map(|line| String::from(line))
+        .collect();
 
     let (rules, updates) = extract_rules_and_updates(&by_line);
 
@@ -32,7 +33,7 @@ fn main() {
     println!("The sum of all fixed middle elements is {fixed_mid_elem_sum}");
 }
 
-fn extract_rules_and_updates (r_and_u: &Vec<String>) -> (Vec<(u32, u32)>, Vec<Vec<u32>>) {
+fn extract_rules_and_updates(r_and_u: &Vec<String>) -> (Vec<(u32, u32)>, Vec<Vec<u32>>) {
     let mut rules = Vec::new();
     let mut updates: Vec<Vec<u32>> = Vec::new();
     for line in r_and_u {
@@ -44,16 +45,13 @@ fn extract_rules_and_updates (r_and_u: &Vec<String>) -> (Vec<(u32, u32)>, Vec<Ve
             }
         }
         if line.contains(",") {
-            let split: Vec<u32> = line.split(",")
-                                        .map(|x| x.parse::<u32>().unwrap())
-                                        .collect();
+            let split: Vec<u32> = line.split(",").map(|x| x.parse::<u32>().unwrap()).collect();
             updates.push(split);
         }
     }
     (rules, updates)
 }
-fn string_to_int (s: &str) -> u32 {
-
+fn string_to_int(s: &str) -> u32 {
     let int: u32 = match s.trim().parse() {
         Ok(num) => num,
         Err(_) => panic!("Fuck, that string didn't become an int"),
@@ -62,7 +60,7 @@ fn string_to_int (s: &str) -> u32 {
     int
 }
 
-fn tuples_to_hashmap (tup_vec: &Vec<(u32, u32)>) -> HashMap<u32, HashSet<u32>> {
+fn tuples_to_hashmap(tup_vec: &Vec<(u32, u32)>) -> HashMap<u32, HashSet<u32>> {
     let mut map = HashMap::new();
     for tup in tup_vec {
         map.entry(tup.0).or_insert(HashSet::new()).insert(tup.1);
@@ -70,7 +68,7 @@ fn tuples_to_hashmap (tup_vec: &Vec<(u32, u32)>) -> HashMap<u32, HashSet<u32>> {
     map
 }
 
-fn update_is_valid (update: &Vec<u32>, rules: &HashMap<u32, HashSet<u32>>) -> bool {
+fn update_is_valid(update: &Vec<u32>, rules: &HashMap<u32, HashSet<u32>>) -> bool {
     for i in 1..update.len() {
         let rule_set = match rules.get(&update[i]) {
             Some(set) => set,
@@ -78,18 +76,18 @@ fn update_is_valid (update: &Vec<u32>, rules: &HashMap<u32, HashSet<u32>>) -> bo
         };
         for j in 0..i {
             if rule_set.contains(&update[j]) {
-                return false
+                return false;
             }
         }
     }
     true
 }
 
-fn middle_element (vec: &Vec<u32>) -> u32 {
+fn middle_element(vec: &Vec<u32>) -> u32 {
     vec[vec.len() / 2]
 }
 
-fn fix_invalid_update (update: &mut Vec<u32>, rules: &HashMap<u32, HashSet<u32>>) -> Vec<u32> {
+fn fix_invalid_update(update: &mut Vec<u32>, rules: &HashMap<u32, HashSet<u32>>) -> Vec<u32> {
     while !update_is_valid(&update, rules) {
         for i in 1..update.len() {
             let rule_set = match rules.get(&update[i]) {
