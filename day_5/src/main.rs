@@ -11,6 +11,7 @@ fn main() {
     } else {
         "day_5/input.txt"
     };
+
     let by_line: Vec<String> = fs::read_to_string(input_file)
         .unwrap()
         .lines()

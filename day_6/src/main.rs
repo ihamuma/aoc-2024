@@ -1,7 +1,6 @@
 use std::collections::HashSet;
 use std::env;
-use std::fs::File;
-use std::io::{BufRead, BufReader};
+use std::fs;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -12,9 +11,12 @@ fn main() {
         "day_6/input.txt"
     };
 
-    let by_line: Vec<String> = file_to_string_vec(input_file);
+    let mut matrix: Vec<Vec<char>> = fs::read_to_string(input_file)
+        .unwrap()
+        .lines()
+        .map(|x| x.chars().collect())
+        .collect();
 
-    let mut matrix: Vec<Vec<char>> = str_vec_to_matrix(by_line);
     let len_y = matrix.len() as i16;
     let len_x = matrix[0].len() as i16;
 
@@ -156,30 +158,6 @@ fn main() {
     }
 
     println!("There are {looping_obstacles} ways to place an object and create an infinite loop")
-}
-
-fn file_to_string_vec(path: &str) -> Vec<String> {
-    let file: File = File::open(&path).expect("Couldn't open file");
-    let reader: BufReader<File> = BufReader::new(file);
-
-    let mut by_line: Vec<String> = Vec::new();
-    for line in reader.lines() {
-        match line {
-            Ok(_) => by_line.push(line.unwrap()),
-            Err(_) => break,
-        }
-    }
-
-    by_line
-}
-
-fn str_vec_to_matrix(str_vec: Vec<String>) -> Vec<Vec<char>> {
-    let mut matrix: Vec<Vec<char>> = Vec::new();
-    for line in str_vec {
-        let as_char_vec: Vec<char> = line.chars().collect();
-        matrix.push(as_char_vec);
-    }
-    matrix
 }
 
 fn find_char(matrix: &Vec<Vec<char>>, target: char) -> Option<(usize, usize)> {

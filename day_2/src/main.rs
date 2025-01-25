@@ -1,6 +1,5 @@
 use std::env;
-use std::fs::File;
-use std::io::{BufRead, BufReader};
+use std::fs;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -11,12 +10,24 @@ fn main() {
         "day_2/input.txt"
     };
 
-    let by_line: Vec<String> = file_to_string_vec(input_file);
+    let by_line: Vec<String> = fs::read_to_string(input_file)
+        .unwrap()
+        .lines()
+        .map(|x| String::from(x))
+        .collect();
 
-    let reports: Vec<Vec<i64>> = split_to_int_vecs(by_line);
+    let reports: Vec<Vec<i8>> = by_line
+        .iter()
+        .map(|line| {
+            line.split(" ")
+                .into_iter()
+                .map(|s| s.trim().parse::<i8>().unwrap())
+                .collect()
+        })
+        .collect();
 
-    let mut safes: u32 = 0;
-    let mut unsafes: Vec<Vec<i64>> = Vec::new();
+    let mut safes: u16 = 0;
+    let mut unsafes: Vec<Vec<i8>> = Vec::new();
 
     for report in reports {
         if check_safety(&report) {
@@ -29,7 +40,7 @@ fn main() {
     println!("There are {} safe reports", safes);
     println!("{} reports are currently unsafe", unsafes.len());
 
-    let mut dampened_safes: u32 = 0;
+    let mut dampened_safes: u16 = 0;
     for report in unsafes {
         if check_dampened_safety(&report) {
             dampened_safes += 1
@@ -46,47 +57,7 @@ fn main() {
     )
 }
 
-fn file_to_string_vec(path: &str) -> Vec<String> {
-    let file: File = File::open(&path).expect("Couldn't open file");
-    let reader: BufReader<File> = BufReader::new(file);
-
-    let mut by_line: Vec<String> = Vec::new();
-    for line in reader.lines() {
-        match line {
-            Ok(_) => by_line.push(line.unwrap()),
-            Err(_) => break,
-        }
-    }
-
-    by_line
-}
-
-fn split_to_int_vecs(vec: Vec<String>) -> Vec<Vec<i64>> {
-    let mut int_vecs: Vec<Vec<i64>> = Vec::new();
-
-    for line in vec {
-        let split: Vec<&str> = line.split(" ").collect();
-        let mut int_vec: Vec<i64> = Vec::new();
-        for s in split {
-            let i = string_to_int(s);
-            int_vec.push(i);
-        }
-        int_vecs.push(int_vec);
-    }
-
-    int_vecs
-}
-
-fn string_to_int(s: &str) -> i64 {
-    let int: i64 = match s.trim().parse() {
-        Ok(num) => num,
-        Err(_) => panic!("Fuck, that string didn't become an int"),
-    };
-
-    int
-}
-
-fn check_safety(report: &Vec<i64>) -> bool {
+fn check_safety(report: &Vec<i8>) -> bool {
     let ascending: bool = report[0] < report[1];
 
     if ascending {
@@ -106,7 +77,7 @@ fn check_safety(report: &Vec<i64>) -> bool {
     true
 }
 
-fn check_dampened_safety(report: &Vec<i64>) -> bool {
+fn check_dampened_safety(report: &Vec<i8>) -> bool {
     for i in 0..report.len() {
         let mut test = report.clone();
         test.remove(i);

@@ -1,6 +1,5 @@
 use std::env;
-use std::fs::File;
-use std::io::{BufRead, BufReader};
+use std::fs;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -11,34 +10,17 @@ fn main() {
         "day_4/input.txt"
     };
 
-    let by_line: Vec<String> = file_to_string_vec(input_file);
-
-    let mut matrix: Vec<Vec<char>> = Vec::new();
-    for line in by_line {
-        let as_char_vecs: Vec<char> = line.chars().collect();
-        matrix.push(as_char_vecs);
-    }
+    let matrix: Vec<Vec<char>> = fs::read_to_string(input_file)
+        .unwrap()
+        .lines()
+        .map(|x| x.chars().collect())
+        .collect();
 
     let xmases = count_xmases(&matrix);
     println!("The amount of xmases is {}", xmases);
 
     let xed_mases = count_xed_mases(&matrix);
     println!("The amount of X-MASes is {}", xed_mases)
-}
-
-fn file_to_string_vec(path: &str) -> Vec<String> {
-    let file: File = File::open(&path).expect("Couldn't open file");
-    let reader: BufReader<File> = BufReader::new(file);
-
-    let mut by_line: Vec<String> = Vec::new();
-    for line in reader.lines() {
-        match line {
-            Ok(_) => by_line.push(line.unwrap()),
-            Err(_) => break,
-        }
-    }
-
-    by_line
 }
 
 fn count_xmases(matrix: &Vec<Vec<char>>) -> u32 {
