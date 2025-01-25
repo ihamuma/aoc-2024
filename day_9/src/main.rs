@@ -1,7 +1,16 @@
+use std::env;
 use std::fs;
 
 fn main() {
-    let disk_map: Vec<u8> = fs::read_to_string("./input.txt")
+    let args: Vec<String> = env::args().collect();
+
+    let input_file = if args.len() > 1 && args[1] == "test" {
+        "day_9/test_input.txt"
+    } else {
+        "day_9/input.txt"
+    };
+
+    let disk_map: Vec<u8> = fs::read_to_string(input_file)
         .unwrap()
         .chars()
         .map(|ch| ch.to_digit(10).unwrap() as u8)

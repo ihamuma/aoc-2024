@@ -1,7 +1,16 @@
 use std::collections::HashSet;
+use std::env;
 
 fn main() {
-    let input = std::fs::read_to_string("./input.txt").unwrap();
+    let args: Vec<String> = env::args().collect();
+
+    let input_file = if args.len() > 1 && args[1] == "test" {
+        "day_8/test_input.txt"
+    } else {
+        "day_8/input.txt"
+    };
+    
+    let input = std::fs::read_to_string(input_file).unwrap();
 
     let matrix: Vec<Vec<char>> = input.lines().map(|line| line.chars().collect()).collect();
     let row_bound = matrix.len() as i8;

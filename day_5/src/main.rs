@@ -1,10 +1,17 @@
 use std::collections::HashMap;
 use std::collections::HashSet;
+use std::env;
 use std::fs;
 
 fn main() {
-    let path: &str = "./input.txt";
-    let by_line: Vec<String> = fs::read_to_string(path)
+    let args: Vec<String> = env::args().collect();
+
+    let input_file = if args.len() > 1 && args[1] == "test" {
+        "day_5/test_input.txt"
+    } else {
+        "day_5/input.txt"
+    };
+    let by_line: Vec<String> = fs::read_to_string(input_file)
         .unwrap()
         .lines()
         .map(|line| String::from(line))

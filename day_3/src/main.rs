@@ -1,9 +1,17 @@
-use regex::Regex;
+use std::env;
 use std::fs;
+use regex::Regex;
 
 fn main() {
-    let path: &str = "./input.txt";
-    let corrupted_memory: String = fs::read_to_string(path).expect("File read not OK");
+    let args: Vec<String> = env::args().collect();
+
+    let input_file = if args.len() > 1 && args[1] == "test" {
+        "day_3/test_input.txt"
+    } else {
+        "day_3/input.txt"
+    };
+
+    let corrupted_memory: String = fs::read_to_string(input_file).expect("File read not OK");
 
     let to_multiply = regex_for_multipliables(&corrupted_memory);
     let sum = sum_multiples_from_str_vec(to_multiply);

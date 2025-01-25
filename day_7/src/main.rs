@@ -1,10 +1,19 @@
 use anyhow::{Context, Ok, Result};
+use std::env;
 
 // Most credit must be attributed to https://gist.github.com/marektamaskovic/3421acf52c7e8da882df503fb5495125
 // This was a great learning experience though
 
 fn main() {
-    let input = std::fs::read_to_string("./input.txt").unwrap();
+    let args: Vec<String> = env::args().collect();
+
+    let input_file = if args.len() > 1 && args[1] == "test" {
+        "day_7/test_input.txt"
+    } else {
+        "day_7/input.txt"
+    };
+
+    let input = std::fs::read_to_string(input_file).unwrap();
 
     let equations: Vec<Equation> = input
         .lines()
@@ -27,7 +36,9 @@ struct Equation {
 static OPERATORS: [fn(u64, u64) -> u64; 3] = [
     |a: u64, b: u64| -> u64 { a + b },
     |a: u64, b: u64| -> u64 { a * b },
-    // Comment out this line for part one result
+    // For part one result:
+    // Modify signature 3 -> 2 
+    // Comment out this line
     |a: u64, b: u64| -> u64 { format!("{}{}", a, b).parse().unwrap() },
 ];
 

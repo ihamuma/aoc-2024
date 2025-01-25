@@ -1,9 +1,17 @@
+use std::env;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 
 fn main() {
-    let path: &str = "./input.txt";
-    let by_line: Vec<String> = file_to_string_vec(path);
+    let args: Vec<String> = env::args().collect();
+
+    let input_file = if args.len() > 1 && args[1] == "test" {
+        "day_4/test_input.txt"
+    } else {
+        "day_4/input.txt"
+    };
+
+    let by_line: Vec<String> = file_to_string_vec(input_file);
 
     let mut matrix: Vec<Vec<char>> = Vec::new();
     for line in by_line {

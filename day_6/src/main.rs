@@ -1,10 +1,18 @@
 use std::collections::HashSet;
+use std::env;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 
 fn main() {
-    let path: &str = "./input.txt";
-    let by_line: Vec<String> = file_to_string_vec(path);
+    let args: Vec<String> = env::args().collect();
+
+    let input_file = if args.len() > 1 && args[1] == "test" {
+        "day_6/test_input.txt"
+    } else {
+        "day_6/input.txt"
+    };
+
+    let by_line: Vec<String> = file_to_string_vec(input_file);
 
     let mut matrix: Vec<Vec<char>> = str_vec_to_matrix(by_line);
     let len_y = matrix.len() as i16;
@@ -116,7 +124,7 @@ fn main() {
             i = new_pos.0;
             j = new_pos.1;
 
-            // If guard makes it outside, mark as previous obstacled and break loop
+            // If guard makes it outside, mark as previously obstacled and break loop
             if is_outside((&i, &j), &len_y, &len_x) {
                 matrix[obs_y][obs_x] = 'P';
                 break 'loop_or_exit;
