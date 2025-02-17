@@ -1,17 +1,8 @@
 use std::collections::HashMap;
 use std::collections::HashSet;
-use std::env;
 use std::fs;
 
-fn main() {
-    let args: Vec<String> = env::args().collect();
-
-    let input_file = if args.len() > 1 && args[1] == "test" {
-        "day_5/test_input.txt"
-    } else {
-        "day_5/input.txt"
-    };
-
+pub fn solve(input_file: &str) {
     let by_line: Vec<String> = fs::read_to_string(input_file)
         .unwrap()
         .lines()
@@ -31,14 +22,14 @@ fn main() {
             invalid_updates.push(update);
         }
     }
-    println!("The sum of all valid middle elements is {valid_mid_elem_sum}");
+    println!("Sum of valid middle elements: {valid_mid_elem_sum}");
 
     let mut fixed_mid_elem_sum = 0;
     for mut inv in invalid_updates {
         let fixed = fix_invalid_update(&mut inv, &mapped_rules);
         fixed_mid_elem_sum += middle_element(&fixed)
     }
-    println!("The sum of all fixed middle elements is {fixed_mid_elem_sum}");
+    println!("Sum of fixed middle elements: {fixed_mid_elem_sum}");
 }
 
 fn extract_rules_and_updates(r_and_u: &Vec<String>) -> (Vec<(u32, u32)>, Vec<Vec<u32>>) {

@@ -1,15 +1,6 @@
-use std::env;
 use std::fs;
 
-fn main() {
-    let args: Vec<String> = env::args().collect();
-
-    let input_file = if args.len() > 1 && args[1] == "test" {
-        "day_9/test_input.txt"
-    } else {
-        "day_9/input.txt"
-    };
-
+pub fn solve(input_file: &str) {
     let disk_map: Vec<u8> = fs::read_to_string(input_file)
         .unwrap()
         .chars()
@@ -30,7 +21,7 @@ fn main() {
         check_sum += i as i64 * mem as i64
     }
 
-    println!("The initial check sum is {check_sum}");
+    println!("Initial check sum: {check_sum}");
 
     let mut free_space_locations = locate_free_spaces(&expanded_layout_two);
     let mut file_locations = locate_files(&expanded_layout_two);
@@ -95,7 +86,7 @@ fn main() {
         }
     }
 
-    println!("The final check sum is {second_check_sum}")
+    println!("Final check sum: {second_check_sum}")
 }
 
 fn expand_layout(disk: Vec<u8>) -> Vec<i16> {

@@ -1,15 +1,6 @@
-use std::env;
 use std::fs;
 
-fn main() {
-    let args: Vec<String> = env::args().collect();
-
-    let input_file = if args.len() > 1 && args[1] == "test" {
-        "day_1/test_input.txt"
-    } else {
-        "day_1/input.txt"
-    };
-
+pub fn solve(input_file: &str) {
     let by_line: Vec<String> = fs::read_to_string(input_file)
         .unwrap()
         .lines()
@@ -27,7 +18,7 @@ fn main() {
 
     let sum: i32 = distances.iter().sum();
 
-    println!("The total distance is: {}", sum);
+    println!("Total distance: {}", sum);
 
     let mut similarity_score: i32 = 0;
     for elem_1 in &locations_one {
@@ -40,7 +31,7 @@ fn main() {
         similarity_score += sim_score * elem_1
     }
 
-    println!("The similarity score is: {}", similarity_score)
+    println!("Similarity score: {}", similarity_score)
 }
 
 fn split_to_int_vecs(vec: Vec<String>) -> (Vec<i32>, Vec<i32>) {

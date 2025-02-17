@@ -1,15 +1,6 @@
-use std::env;
 use std::fs;
 
-fn main() {
-    let args: Vec<String> = env::args().collect();
-
-    let input_file = if args.len() > 1 && args[1] == "test" {
-        "day_4/test_input.txt"
-    } else {
-        "day_4/input.txt"
-    };
-
+pub fn solve(input_file: &str) {
     let matrix: Vec<Vec<char>> = fs::read_to_string(input_file)
         .unwrap()
         .lines()
@@ -17,10 +8,10 @@ fn main() {
         .collect();
 
     let xmases = count_xmases(&matrix);
-    println!("The amount of xmases is {}", xmases);
+    println!("xmases: {}", xmases);
 
     let xed_mases = count_xed_mases(&matrix);
-    println!("The amount of X-MASes is {}", xed_mases)
+    println!("X-MASes: {}", xed_mases)
 }
 
 fn count_xmases(matrix: &Vec<Vec<char>>) -> u32 {

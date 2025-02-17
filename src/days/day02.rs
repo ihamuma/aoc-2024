@@ -1,15 +1,6 @@
-use std::env;
 use std::fs;
 
-fn main() {
-    let args: Vec<String> = env::args().collect();
-
-    let input_file = if args.len() > 1 && args[1] == "test" {
-        "day_2/test_input.txt"
-    } else {
-        "day_2/input.txt"
-    };
-
+pub fn solve(input_file: &str) {
     let by_line: Vec<String> = fs::read_to_string(input_file)
         .unwrap()
         .lines()

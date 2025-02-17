@@ -1,22 +1,13 @@
 use regex::Regex;
-use std::env;
 use std::fs;
 
-fn main() {
-    let args: Vec<String> = env::args().collect();
-
-    let input_file = if args.len() > 1 && args[1] == "test" {
-        "day_3/test_input.txt"
-    } else {
-        "day_3/input.txt"
-    };
-
+pub fn solve(input_file: &str) {
     let corrupted_memory: String = fs::read_to_string(input_file).expect("File read not OK");
 
     let to_multiply = regex_for_multipliables(&corrupted_memory);
     let sum = sum_multiples_from_str_vec(to_multiply);
 
-    println!("The sum of uncorrupted multiplications is {}", sum);
+    println!("Sum of uncorrupted multiplications: {}", sum);
 
     let split_dos = split_by_do_and_dont(&corrupted_memory);
     let joined_dos = split_dos.join("");
@@ -24,7 +15,7 @@ fn main() {
     let summed_dos = sum_multiples_from_str_vec(dos_to_multiply);
 
     println!(
-        "The sum of uncorrupted multiplications to 'do' is {}",
+        "Sum of uncorrupted multiplications to 'do': {}",
         summed_dos
     );
 }
