@@ -1,8 +1,9 @@
-[package]
-name = "aoc-2024"
-version = "0.1.0"
-edition = "2021"
+[workspace]
+resolver = "2"
+members = [
+    "2024",
+]
 
-[dependencies]
+[workspace.dependencies]
 regex = "1.11.1"
 anyhow = "1.0.94"

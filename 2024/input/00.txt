@@ -1,0 +1,3 @@
+This is merely a dummy input file to ensure I don't forget where input files should go.
+
+Remember to .gitignore inputs!

@@ -1,5 +1,8 @@
 *.txt
+!00.txt
 
 # Added by cargo
-
 /target
+
+# Cargo.lock for workspace members (keep root Cargo.lock)
+/year*/Cargo.lock
