@@ -1,7 +1,7 @@
 [workspace]
 resolver = "2"
 members = [
-    "2024",
+    "year2024",
 ]
 
 [workspace.dependencies]

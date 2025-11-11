@@ -6,12 +6,12 @@ This repository contains solutions for [Advent of Code](https://adventofcode.com
 
 ```
 aoc/
-├── 2024/       # 2024 solutions in Rust
+├── year2024/       # 2024 solutions in Rust
 │   ├── src/
 │   │   ├── days/       # Solutions for each day
 │   ├── input/          # Puzzle inputs (01.txt, 02.txt, etc.)
 │   └── input_test/     # Test inputs
-├── 2025/       # 2025 solutions (to be added)
+├── year2025/       # 2025 solutions (to be added)
 └── ...
 ```
 
