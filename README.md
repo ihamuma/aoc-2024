@@ -44,7 +44,7 @@ cargo run -p year2025 5
 
 To add solutions for a new year:
 
-1. Create a new directory: `YYYY/`
+1. Create a new directory: `yearYYYY/`
 2. Copy the structure from an existing year
 3. Add the new year to the workspace members in the root `Cargo.toml`
-4. Place input files in `YYYY/input/` and `YYYY/input_test/`
+4. Place input files in `yearYYYY/input/` and `yearYYYY/input_test/`
