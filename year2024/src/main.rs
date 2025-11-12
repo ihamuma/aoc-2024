@@ -13,9 +13,9 @@ fn main() {
     let day = &args[1].parse::<u8>().unwrap_or(0);
     let is_test = args.get(2).map(|s| s == "test").unwrap_or(false);
     let file_path = if is_test {
-        format!("year2024/input_test/{:02}.txt", day)
+        format!("input_test/{:02}.txt", day)
     } else {
-        format!("year2024/input/{:02}.txt", day)
+        format!("input/{:02}.txt", day)
     };
 
     let now = Instant::now();
